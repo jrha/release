@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REPOS="aii CAF CCM cdp-listend configuration-modules-core configuration-modules-grid LC ncm-cdispd ncm-ncd ncm-query"
+REPOS="aii CAF CCM cdp-listend configuration-modules-core configuration-modules-grid LC maven-tools ncm-cdispd ncm-lib-blockdevices ncm-ncd ncm-query pkgtree protocols quattor-remote-configure release rpmt-py scdb scdb-ant-utils spma template-library-core template-library-examples template-library-grid template-library-os template-library-standard"
 RELEASE=""
 
 if [[ -n $1 && -n $2 ]]; then
@@ -14,9 +14,9 @@ else
 fi
 
 details=""
+mkdir -p notes
 
 for r in $REPOS; do
-    echo "* $r"
     if [[ ! -d $r ]]; then
         git clone -q git@github.com:quattor/$r.git
     fi
@@ -26,7 +26,7 @@ for r in $REPOS; do
     git pull -r > /dev/null
     from=$(git tag | grep $PREV'$')
     to=$(git tag | grep $RELEASE'$')
-    git log $from..$to --oneline | grep -v '\[maven-release-plugin\]' | grep -v 'Merge pull request' | sed 's/^/    * /g'
+    git log $from..$to --oneline | grep -v '\[maven-release-plugin\]' | grep 'Merge pull request' | grep -o '#[0-9]\+' > ../notes/$r
     details="$details\n$r\t$(git branch | grep '^*')"
     cd ..
 done
